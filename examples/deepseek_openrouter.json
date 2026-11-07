@@ -1,0 +1,8 @@
+{
+  "llm": {
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-chat-v3.1",
+    "reasoning_enabled": false,
+    "max_tokens": 4096
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "llm": {
+    "provider": "deepseek",
+    "model": "deepseek-chat",
+    "reasoning_enabled": false
+  }
+}

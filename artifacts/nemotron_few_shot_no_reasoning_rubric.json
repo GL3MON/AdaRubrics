@@ -1,0 +1,54 @@
+{
+  "task_id": "nemotron-few-shot-test",
+  "dimensions": [
+    {
+      "name": "SearchStrategyQuality",
+      "description": "Effectiveness of search queries in capturing geography, product type, and volume requirements for steel pipe sourcing.",
+      "weight": 1.5,
+      "scoring_criteria": {
+        "5": "Formulates highly specific, multi-faceted search queries that precisely target German steel pipe suppliers with clear volume/context parameters; covers entire requirement space.",
+        "4": "Formulates effective search queries that cover most requirement dimensions (geography, product type); minor omissions in volume or specificity.",
+        "3": "Formulates basic search queries that capture core requirements but lack specificity or miss secondary dimensions; partial coverage of requirement space.",
+        "2": "Formulates vague or generic search queries that miss critical dimensions (e.g., geography or product type); significant gaps in requirement coverage.",
+        "1": "Formulates ineffective search queries that fail to retrieve relevant supplier information; fundamentally misaligned with task requirements."
+      }
+    },
+    {
+      "name": "DataExtractionAccuracy",
+      "description": "Correctness and completeness of extracting supplier data (names, prices, specifications) from search results and API responses.",
+      "weight": 1.5,
+      "scoring_criteria": {
+        "5": "Accurately extracts all required fields for every supplier with complete specifications; no data gaps or errors; properly structures comparative data.",
+        "4": "Extracts required fields for most suppliers with minor omissions or slight formatting issues; nearly all critical data present and accurate.",
+        "3": "Extracts core supplier information (names, prices) with moderate accuracy; some missing fields or minor errors in specifications; workable but incomplete data.",
+        "2": "Extracts supplier data with significant errors or omissions; missing critical fields (prices, names); data structure makes comparison difficult.",
+        "1": "Fails to extract meaningful supplier data; extraction errors pervasive; no usable supplier information obtained from search results."
+      }
+    },
+    {
+      "name": "ComparativeReasoningRigor",
+      "description": "Systematic comparison of supplier options using consistent criteria rather than ad-hoc judgments.",
+      "weight": 1.0,
+      "scoring_criteria": {
+        "5": "Systematically compares all three suppliers using identical criteria (price, quality, logistics); explicit ranking methodology; transparent trade-off analysis.",
+        "4": "Compares suppliers using mostly consistent criteria with minor inconsistencies; clear ranking with reasonable justification; minor gaps in comparison framework.",
+        "3": "Compares suppliers with partial consistency; some criteria used systematically but others ad-hoc; reasonable comparison but lacks full methodological rigor.",
+        "2": "Compares suppliers inconsistently; criteria change between evaluations; ranking appears arbitrary or biased; limited comparative analysis.",
+        "1": "Fails to compare suppliers meaningfully; no systematic evaluation; recommendations based on single factor or intuition without comparative framework."
+      }
+    },
+    {
+      "name": "RecommendationJustification",
+      "description": "Quality of logical reasoning connecting collected data to the final cheapest option recommendation.",
+      "weight": 1.0,
+      "scoring_criteria": {
+        "5": "Explicitly derives the cheapest option from collected price data with clear logical steps; addresses potential counter-arguments; fully justified recommendation.",
+        "4": "Clearly identifies the cheapest option from collected data with sound reasoning; minor gaps in justification but overall logical connection established.",
+        "3": "Identifies the cheapest option with reasonable logic; connection between data and recommendation is apparent but may lack thorough explanation or address edge cases.",
+        "2": "Recommendation is weakly supported; logical connection between data and cheapest option is tenuous or unclear; significant justification gaps.",
+        "1": "Recommendation is unsupported or illogical; no connection between collected data and claimed cheapest option; recommendation appears arbitrary."
+      }
+    }
+  ],
+  "generation_rationale": "These four dimensions were chosen to cover the complete task pipeline: (1) SearchStrategyQuality assesses whether the agent effectively initiates the task by formulating queries that capture geography (Germany), product type (steel pipes), and implicit volume requirements. (2) DataExtractionAccuracy measures the agent's ability to reliably parse and structure supplier information from search results, which is fundamental for any subsequent comparison. (3) ComparativeReasoningRigor evaluates the systematicness of the comparison phase, ensuring the agent uses consistent criteria rather than arbitrary judgments when evaluating options. (4) RecommendationJustification assesses the final output quality, verifying that the cheapest recommendation is logically derived from the collected price data. These dimensions are orthogonal—each captures a distinct phase of the sourcing process—and collectively they provide fine-grained evaluation of task performance without redundant assessment."
+}

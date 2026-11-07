@@ -3,10 +3,15 @@
 Usage:
     export OPENAI_API_KEY="sk-..."
     python examples/quickstart.py
+
+    # OpenRouter:
+    export OPENROUTER_API_KEY="sk-or-..."
+    python examples/quickstart.py --provider openrouter --model openai/gpt-4o
 """
 
 from __future__ import annotations
 
+import argparse
 import asyncio
 
 from adarubric import (
@@ -15,10 +20,21 @@ from adarubric import (
     Trajectory,
     TrajectoryStep,
 )
-from adarubric.config import AdaRubricConfig
+from adarubric.config import AdaRubricConfig, LLMConfig
 
 
 async def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--provider", choices=["openai", "openrouter", "deepseek", "vllm"], default="openai",
+    )
+    parser.add_argument("--model", help="Provider model ID, e.g. openai/gpt-4o for OpenRouter")
+    parser.add_argument("--base-url", help="Override the provider API base URL")
+    parser.add_argument(
+        "--reasoning", action=argparse.BooleanOptionalAction, default=None,
+        help="Enable or disable OpenRouter/DeepSeek reasoning (default: model setting)",
+    )
+    args = parser.parse_args()
     task = TaskDescription(
         task_id="demo-001",
         instruction=(
@@ -66,7 +82,12 @@ async def main() -> None:
         ),
     )
 
-    config = AdaRubricConfig()
+    llm = LLMConfig(
+        provider=args.provider, base_url=args.base_url, reasoning_enabled=args.reasoning,
+    )
+    if args.model:
+        llm.model = args.model
+    config = AdaRubricConfig(llm=llm)
     pipeline = AdaRubricPipeline.from_config(config)
 
     result = await pipeline.run(task, [trajectory], num_dimensions=5)

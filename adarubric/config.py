@@ -15,16 +15,23 @@ import json
 import os
 from pathlib import Path
 
-from pydantic import BaseModel, Field
+from dotenv import load_dotenv
+from pydantic import BaseModel, Field, model_validator
 
 
 class LLMConfig(BaseModel):
     """LLM backend configuration."""
 
-    provider: str = Field(default="openai", description="LLM provider: openai | vllm")
+    provider: str = Field(
+        default="openai", description="LLM provider: openai | openrouter | deepseek | vllm",
+    )
     model: str = Field(default="gpt-4o")
     api_key: str | None = None
     base_url: str | None = None
+    reasoning_enabled: bool | None = Field(
+        default=None,
+        description="OpenRouter/DeepSeek reasoning toggle; None uses the model default",
+    )
     max_retries: int = Field(default=3, ge=1)
     temperature: float = Field(default=0.0, ge=0.0, le=2.0)
     max_tokens: int = Field(
@@ -32,6 +39,16 @@ class LLMConfig(BaseModel):
         ge=256,
         description="Default max completion tokens; generator/evaluator may override",
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def provider_defaults(cls, data: object) -> object:
+        """Choose a provider-qualified default model for OpenRouter."""
+        if isinstance(data, dict) and data.get("provider") == "openrouter":
+            return {"model": "openai/gpt-4o", **data}
+        if isinstance(data, dict) and data.get("provider") == "deepseek":
+            return {"model": "deepseek-chat", **data}
+        return data
 
 
 class GeneratorConfig(BaseModel):
@@ -126,9 +143,13 @@ class AdaRubricConfig(BaseModel):
 
 def _apply_env_overrides(config: AdaRubricConfig) -> AdaRubricConfig:
     """Override sensitive fields from environment variables. Returns a new config."""
+    load_dotenv(dotenv_path=Path.cwd() / ".env", override=False)
     if config.llm.api_key is not None:
         return config
-    env_key = os.environ.get("OPENAI_API_KEY")
+    key_var = {
+        "openrouter": "OPENROUTER_API_KEY", "deepseek": "DEEPSEEK_API_KEY",
+    }.get(config.llm.provider, "OPENAI_API_KEY")
+    env_key = os.environ.get(key_var)
     if not env_key:
         return config
     updated_llm = config.llm.model_copy(update={"api_key": env_key})

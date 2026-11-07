@@ -9,8 +9,10 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+from pathlib import Path
 from typing import Any, TypeVar, cast
 
+from dotenv import load_dotenv
 from pydantic import BaseModel, ValidationError
 
 from adarubric.core.exceptions import LLMClientError
@@ -62,8 +64,11 @@ class OpenAIClient(LLMClient):
         api_key: str | None = None,
         base_url: str | None = None,
         max_retries: int = 3,
+        extra_body: dict[str, Any] | None = None,
     ) -> None:
+        load_dotenv(dotenv_path=Path.cwd() / ".env", override=False)
         self.model = model
+        self._extra_body = extra_body
         self._max_retries = max(1, max_retries)
         self._client = AsyncOpenAI(api_key=api_key, base_url=base_url)
 
@@ -84,6 +89,8 @@ class OpenAIClient(LLMClient):
         }
         if json_mode:
             kwargs["response_format"] = {"type": "json_object"}
+        if self._extra_body is not None:
+            kwargs["extra_body"] = self._extra_body
 
         delay = 2.0
         last_exc: Exception | None = None

@@ -1,0 +1,54 @@
+{
+  "task_id": "nemotron-few-shot-test",
+  "dimensions": [
+    {
+      "name": "SearchQueryFormulation",
+      "description": "Effectiveness of search queries in capturing geography (Germany) and product specificity (steel pipes) to retrieve relevant supplier data.",
+      "weight": 1.5,
+      "scoring_criteria": {
+        "1": "Queries are generic or missing key constraints, returning largely irrelevant results.",
+        "2": "Queries include basic constraints but miss either geography or product details, yielding partially relevant results.",
+        "3": "Queries correctly include both geography and product type, yielding predominantly relevant supplier results.",
+        "4": "Queries are refined with additional filters (e.g., pipe grade, diameter) to improve precision and supplier relevance.",
+        "5": "Queries are optimal, using advanced search operators or API-specific features to exactly match the requirement space, yielding the most relevant results with minimal noise."
+      }
+    },
+    {
+      "name": "DataExtractionAccuracy",
+      "description": "Correctness and completeness of extracting supplier names, prices, specifications, and other relevant data from search API responses.",
+      "weight": 1.5,
+      "scoring_criteria": {
+        "1": "Fails to extract any structured data; outputs are missing, garbled, or hallucinated.",
+        "2": "Extracts some data but misses critical fields or includes frequent errors.",
+        "3": "Extracts core data (name, price) correctly for most suppliers retrieved.",
+        "4": "Extracts all required fields accurately for all suppliers, including specifications and metadata.",
+        "5": "Perfect extraction with proper structuring, validation, and no missing or erroneous data across all responses."
+      }
+    },
+    {
+      "name": "ComparativeAnalysisRigor",
+      "description": "Systematic comparison of suppliers using consistent criteria (price, quality, location) rather than ad-hoc judgments.",
+      "weight": 1.0,
+      "scoring_criteria": {
+        "1": "No comparison performed; selection is random or based on a single irrelevant factor.",
+        "2": "Comparison is superficial; uses inconsistent or unclear criteria across suppliers.",
+        "3": "Compares suppliers using a basic set of criteria with some consistency, but coverage is partial.",
+        "4": "Structured comparison matrix applied uniformly; all relevant criteria evaluated for each supplier.",
+        "5": "Comprehensive comparative analysis with weighted scoring, sensitivity checks, and clear rationale for each supplier's standing relative to all criteria."
+      }
+    },
+    {
+      "name": "RecommendationJustification",
+      "description": "Logical derivation of the cheapest option recommendation from collected data, with explicit reasoning tied to comparison results.",
+      "weight": 1.0,
+      "scoring_criteria": {
+        "1": "Recommendation is absent, arbitrary, or unrelated to the collected data.",
+        "2": "Recommendation stated without reasoning or misaligned with the comparison results.",
+        "3": "Recommendation identifies the cheapest option but with thin or vague justification.",
+        "4": "Recommendation clearly links to comparison data, explaining why it is the cheapest based on price criteria.",
+        "5": "Recommendation is fully justified, includes trade-off analysis, explicitly ties to all comparison criteria, and anticipates potential objections."
+      }
+    }
+  ],
+  "generation_rationale": "Dimensions are derived directly from the task requirements: search query formulation captures geography and product specificity; data extraction ensures accurate retrieval of supplier information; comparative analysis rigor evaluates systematic comparison using consistent criteria; recommendation justification ensures the final cheapest option is logically derived from the comparison. These dimensions are orthogonal, covering distinct phases of the task (query, extraction, comparison, recommendation), and are observable from the agent's Thought-Action-Observation trajectory."
+}

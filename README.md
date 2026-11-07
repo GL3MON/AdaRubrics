@@ -84,7 +84,9 @@ TaskDescription
 ```bash
 git clone https://github.com/alphadl/AdaRubrics.git
 cd AdaRubrics
-pip install -e ".[dev]"
+uv venv
+source .venv/bin/activate
+uv pip install -e ".[dev]"
 ```
 
 Set `OPENAI_API_KEY` in your environment (or pass via config). YAML config support requires `pip install pyyaml`.
@@ -146,6 +148,90 @@ python examples/quickstart.py
 
 ---
 
+## OpenRouter
+
+Use `provider="openrouter"` to send requests to `https://openrouter.ai/api/v1`.
+Copy `.env.example` to `.env` in the directory you run from, and replace the
+placeholder with your OpenRouter key. The library loads this file automatically;
+existing environment variables take precedence, and explicit client/config
+arguments take precedence over both. `.env` is ignored by git.
+
+Run the example inside the uv environment:
+
+```bash
+cp .env.example .env
+# Edit .env to set OPENROUTER_API_KEY, then run:
+.venv/bin/python examples/quickstart.py --provider openrouter --model openai/gpt-4o
+```
+
+Configure the pipeline directly:
+
+```python
+from adarubric import AdaRubricPipeline
+from adarubric.config import AdaRubricConfig, LLMConfig
+
+config = AdaRubricConfig(llm=LLMConfig(
+    provider="openrouter",
+    model="openai/gpt-4o",
+))
+pipeline = AdaRubricPipeline.from_config(config)
+```
+
+JSON and YAML configurations also accept `"provider": "openrouter"` under `llm`.
+Use OpenRouter's provider-qualified model IDs. The default is `openai/gpt-4o`;
+rubric generation and evaluation require a model supporting JSON object mode.
+Pass `llm.api_key` to override `OPENROUTER_API_KEY`. Pass `llm.base_url` (or
+`--base-url` in the example) to override `OPENROUTER_BASE_URL` and the default
+endpoint. OpenRouter credentials are resolved independently of `OPENAI_API_KEY`.
+
+The client can also be used directly with `async with OpenRouterClient(...)`,
+imported from `adarubric.llm`, for text or structured generation.
+See [OpenRouter's authentication documentation](https://openrouter.ai/docs/api/reference/authentication)
+for API setup details.
+
+---
+
+## DeepSeek through OpenRouter
+
+Use your existing `OPENROUTER_API_KEY` in `.env`; no separate DeepSeek key is needed.
+The [DeepSeek V3.1 model](https://openrouter.ai/deepseek/deepseek-chat-v3.1)
+is available through the same OpenRouter client (OpenRouter pricing applies).
+
+```bash
+.venv/bin/python examples/quickstart.py --provider openrouter \
+  --model deepseek/deepseek-chat-v3.1 --no-reasoning
+```
+
+Or load the included configuration:
+
+```python
+config = AdaRubricConfig.from_json("examples/deepseek_openrouter.json")
+pipeline = AdaRubricPipeline.from_config(config)
+```
+
+Set `llm.reasoning_enabled` to `false` to request no reasoning, `true` to enable it,
+or omit it to use the model default. This setting applies to both rubric generation
+and trajectory evaluation through OpenRouter. Direct client usage also accepts
+`OpenRouterClient(model="deepseek/deepseek-chat-v3.1", reasoning_enabled=False)`.
+
+---
+
+## Direct DeepSeek API
+
+Set `DEEPSEEK_API_KEY` in `.env`, then run:
+
+```bash
+.venv/bin/python examples/quickstart.py --provider deepseek --model deepseek-chat --no-reasoning
+```
+
+Or load `AdaRubricConfig.from_json("examples/deepseek_direct.json")`.
+The direct client uses `https://api.deepseek.com` and accepts `DEEPSEEK_BASE_URL`
+or an explicit `llm.base_url` override. Credentials remain separate from OpenRouter.
+`reasoning_enabled=false` sends DeepSeek's `thinking.type=disabled` option.
+See [DeepSeek API documentation](https://api-docs.deepseek.com/api/create-chat-completion/).
+
+---
+
 ## Architecture
 
 ### Aggregation Strategies
@@ -170,7 +256,7 @@ python examples/quickstart.py
 ```
 adarubric/
 ├── core/           # Data models, exceptions, types
-├── llm/            # LLM client abstraction (OpenAI, vLLM)
+├── llm/            # LLM client abstraction (OpenAI, OpenRouter, vLLM)
 ├── generator/      # Dynamic rubric generation + prompts
 ├── evaluator/      # Trajectory evaluation + aggregation
 ├── filter/         # Composable filtering strategies

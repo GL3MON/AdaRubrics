@@ -47,7 +47,9 @@ from adarubric.filter.threshold import (
 from adarubric.generator.base import RubricGenerator
 from adarubric.generator.llm_generator import LLMRubricGenerator
 from adarubric.llm.base import LLMClient
+from adarubric.llm.deepseek_client import DeepSeekClient
 from adarubric.llm.openai_client import OpenAIClient
+from adarubric.llm.openrouter_client import OpenRouterClient
 
 logger = logging.getLogger(__name__)
 
@@ -261,6 +263,20 @@ class AdaRubricPipeline:
                 api_key=llm_cfg.api_key,
                 base_url=llm_cfg.base_url,
                 max_retries=max(1, llm_cfg.max_retries),
+            )
+        elif llm_cfg.provider == "openrouter":
+            client = OpenRouterClient(
+                model=llm_cfg.model,
+                api_key=llm_cfg.api_key,
+                base_url=llm_cfg.base_url,
+                max_retries=llm_cfg.max_retries,
+                reasoning_enabled=llm_cfg.reasoning_enabled,
+            )
+        elif llm_cfg.provider == "deepseek":
+            client = DeepSeekClient(
+                model=llm_cfg.model, api_key=llm_cfg.api_key,
+                base_url=llm_cfg.base_url, max_retries=llm_cfg.max_retries,
+                reasoning_enabled=llm_cfg.reasoning_enabled,
             )
         elif llm_cfg.provider == "vllm":
             from adarubric.llm.vllm_client import VLLMClient

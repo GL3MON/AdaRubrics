@@ -1,0 +1,54 @@
+{
+  "task_id": "deepseek-few-shot-test",
+  "dimensions": [
+    {
+      "name": "SearchQueryEffectiveness",
+      "description": "Measures how well the agent formulates search queries to comprehensively cover German steel pipe suppliers, including relevant filters like product type and location.",
+      "weight": 1.5,
+      "scoring_criteria": {
+        "1": "Queries are irrelevant, miss key terms (e.g., 'steel pipes', 'Germany'), or are syntactically broken.",
+        "2": "Queries are overly broad or narrow, missing critical filters (e.g., no geographic constraint), yielding poor results.",
+        "3": "Queries include basic terms like 'steel pipes Germany' but lack refinement for top suppliers or pricing focus.",
+        "4": "Queries are well-structured with relevant filters (e.g., 'top suppliers', 'price lists') but may miss minor optimizations.",
+        "5": "Queries are highly targeted, using precise terms and filters (e.g., 'best steel pipe suppliers Germany bulk prices') to maximize relevant results."
+      }
+    },
+    {
+      "name": "DataExtractionAccuracy",
+      "description": "Assesses the agent's ability to correctly identify and extract supplier names, prices, and other key details from API responses without errors.",
+      "weight": 1.5,
+      "scoring_criteria": {
+        "1": "Fails to extract any relevant data or consistently misinterprets API responses.",
+        "2": "Extracts incomplete or inaccurate data (e.g., wrong prices, missing suppliers), leading to flawed comparisons.",
+        "3": "Extracts basic supplier and price data but may overlook nuances like currency units or quantity discounts.",
+        "4": "Accurately extracts all key details for most suppliers, with minor omissions or formatting issues.",
+        "5": "Precisely extracts all relevant data, including supplier names, exact prices, and any additional criteria (e.g., delivery terms)."
+      }
+    },
+    {
+      "name": "PriceComparisonRigor",
+      "description": "Evaluates whether the agent systematically compares prices across suppliers using consistent metrics and identifies the cheapest option correctly.",
+      "weight": 1.0,
+      "scoring_criteria": {
+        "1": "No comparison attempted, or comparison is entirely illogical or arbitrary.",
+        "2": "Comparison is inconsistent (e.g., mixes currencies or units) or misses obvious cheapest option.",
+        "3": "Compares prices superficially (e.g., only list prices) without validating consistency or checking for errors.",
+        "4": "Compares prices rigorously, accounting for units and currencies, but may lack depth (e.g., ignores bulk discounts).",
+        "5": "Performs thorough comparison with normalized metrics (e.g., cost per unit), validates data consistency, and correctly identifies cheapest supplier."
+      }
+    },
+    {
+      "name": "RecommendationClarity",
+      "description": "Measures how clearly and logically the agent presents the final recommendation, including justification based on the data collected.",
+      "weight": 1.0,
+      "scoring_criteria": {
+        "1": "No recommendation provided, or it is completely unsupported by the data.",
+        "2": "Recommendation is vague, illogical, or contradicts the extracted data.",
+        "3": "Recommendation is stated but with weak or incomplete justification (e.g., no reference to price data).",
+        "4": "Recommendation is clear and logically derived from the comparison, but justification could be more detailed.",
+        "5": "Recommendation is explicit, well-justified with specific data points, and clearly identifies the cheapest option."
+      }
+    }
+  ],
+  "generation_rationale": "These dimensions were chosen to cover the key phases of the task: query formulation (SearchQueryEffectiveness), data handling (DataExtractionAccuracy), analytical reasoning (PriceComparisonRigor), and output quality (RecommendationClarity). They are orthogonal, observable in the agent's trajectory, and weighted to reflect the importance of accurate data retrieval and analysis for supplier sourcing."
+}
